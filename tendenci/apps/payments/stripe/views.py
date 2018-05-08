@@ -136,17 +136,17 @@ class FetchAccessToken(View):
         response_json = r.json()
         if r.ok:
             stripe_user_id = response_json['stripe_user_id']
-            livemode = response_json['livemode']
+#             livemode = response_json['livemode']
             sa, created = StripeAccount.objects.get_or_create(stripe_user_id=stripe_user_id)
-            if livemode:
-                sa.livemode_access_token = response_json['access_token']
-                sa.livemode_stripe_publishable_key = response_json['stripe_publishable_key']
-            else:
-                sa.testmode_access_token = response_json['access_token']
-                sa.testmode_stripe_publishable_key = response_json['stripe_publishable_key']
+#             if livemode:
+#                 sa.livemode_access_token = response_json['access_token']
+#                 sa.livemode_stripe_publishable_key = response_json['stripe_publishable_key']
+#             else:
+#                 sa.testmode_access_token = response_json['access_token']
+#                 sa.testmode_stripe_publishable_key = response_json['stripe_publishable_key']
             sa.scope = response_json['scope']
-            sa.token_type = response_json['token_type']
-            sa.refresh_token = response_json['refresh_token']
+#             sa.token_type = response_json['token_type']
+#             sa.refresh_token = response_json['refresh_token']
             if not sa.creator:
                 sa.creator = request.user
                 sa.creator_username = request.user.username
