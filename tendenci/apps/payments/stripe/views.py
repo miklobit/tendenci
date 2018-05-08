@@ -124,8 +124,14 @@ class FetchAccessToken(View):
 
     def get(self, request):
         code = request.GET.get('code')
+        state = request.GET.get('state', None)
+        csrf_token = request.META.get("CSRF_COOKIE", None)
+
         if not code:
             raise Http404
+        # if csrf_token doesn't match, raise 403
+        if state != csrf_token:
+            raise Http403
 
         # fetch access token
         r = requests.post(STRIPE_TOKEN_URL,
