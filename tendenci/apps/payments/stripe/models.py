@@ -23,3 +23,19 @@ class StripeAccount(TendenciBaseModel):
 #     testmode_access_token = models.CharField(max_length=200)
 #     livemode_stripe_publishable_key = models.CharField(max_length=200)
 #     testmode_stripe_publishable_key = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.account_name
+
+
+class Charge(models.Model):
+    account = models.ForeignKey(StripeAccount, related_name="stripe_charges", on_delete=models.CASCADE)
+    charge_id = models.CharField(max_length=100, default='')
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    amount_refunded = models.DecimalField(max_digits=15, decimal_places=2)
+    currency = models.CharField(max_length=5, default='usd')
+    captured = models.BooleanField(default=False)
+    livemode = models.BooleanField(default=False)
+    charge_dt = models.DateTimeField(_("Charged On"))
+    create_dt = models.DateTimeField(_("Created On"), auto_now_add=True)
+    update_dt = models.DateTimeField(_("Last Updated"), auto_now=True)
