@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
 
 from tendenci.apps.perms.admin import TendenciBaseModelAdmin
 from models import StripeAccount, Charge
