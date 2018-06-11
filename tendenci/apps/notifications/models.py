@@ -30,7 +30,7 @@ from django.utils.safestring import mark_safe
 
 from tendenci.apps.site_settings.utils import get_setting
 from tendenci.apps.emails.models import Email
-from tendenci.apps.base.utils import add_tendenci_footer
+from tendenci.apps.base.utils import add_tendenci_footer, is_valid_domain
 
 
 logger = logging.getLogger(__name__)
@@ -416,7 +416,7 @@ def send_emails(emails, label, extra_context=None, on_site=True):
     sender_display = extra_context.get('sender_display', '')
     # Add quotes around display name to prevent errors on sending
     # when display name contains comma or other control characters, - jennyq
-    from_display = '"%s"<%s>' % (sender_display, sender)
+    from_display = '"%s" <%s>' % (sender_display, sender)
 
     if sender_display:
         headers['From'] = from_display
@@ -429,20 +429,21 @@ def send_emails(emails, label, extra_context=None, on_site=True):
     body = add_tendenci_footer(body)
 
     for email_addr in emails:
-        recipients = [email_addr]
+        if is_valid_domain(email_addr):
+            recipients = [email_addr]
 
-        if recipient_bcc:
-            email = EmailMessage(subject, body, sender,
-                                 recipients, recipient_bcc, headers=headers)
-        else:
-            email = EmailMessage(subject, body, sender,
-                                 recipients, headers=headers)
-        email.content_subtype = content_type
-
-        try:
-            email.send(fail_silently=True)  # should we raise exception or not?
-        except UnicodeError:
-            pass
+            if recipient_bcc:
+                email = EmailMessage(subject, body, sender,
+                                     recipients, recipient_bcc, headers=headers)
+            else:
+                email = EmailMessage(subject, body, sender,
+                                     recipients, headers=headers)
+            email.content_subtype = content_type
+    
+            try:
+                email.send(fail_silently=True)  # should we raise exception or not?
+            except UnicodeError:
+                pass
 
     to = ','.join(emails)
     bcc = ','.join(recipient_bcc)
